@@ -1,135 +1,142 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"math/rand/v2"
+	"PostRPG/Battlefield"
+	_ "fmt"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
+	"log"
+	"os"
+	"strconv"
+	_ "strings"
 )
 
 const (
-	maxLakeSize   = 8
-	maxWallsCells = 5
+	landColor     = "#4C956C"
+	waterColor    = "#0B598D"
+	wallColor     = "#A89D9E"
+	outboundColor = "#FF0000"
+	borderColor   = "#322F20"
+	letterColor   = "#322F20"
 )
 
-const (
-	LAND = iota
-	WATER
-	WALL
-	OUTBOUNDS
-)
-
-func buildMap(lakes int, buildings int) [][]int {
-	array := make([][]int, 10)
-
-	for i := range array {
-		array[i] = make([]int, 10)
+type model struct {
+	bfield [][]int
+	cursor struct {
+		x int
+		y int
 	}
-
-	for i := 0; i < lakes; i++ {
-		size := rand.IntN(maxLakeSize)
-		buildLake(array, size)
-	}
-	for i := 0; i < buildings; i++ {
-		buildWalls(array)
-	}
-	return array
+	style lipgloss.Style
+	table *table.Table
 }
 
-func buildLake(battlefield [][]int, size int) {
-	x := rand.IntN(len(battlefield))
-	y := rand.IntN(len(battlefield[0]))
-
-	directions := [][]int{
-		{0, 1},
-		{1, 0},
-		{0, -1},
-		{-1, 0},
+/*
+	type Styles struct {
+		BorderColor lipglosrs.Color
+		InputField  lipgloss.Style
 	}
+*/
+//For the future
+func DefaultStyles(m model) lipgloss.Style {
+	re := lipgloss.NewRenderer(os.Stdout)
+	baseStyle := re.NewStyle().Border(lipgloss.DoubleBorder())
 
-	for size > 0 {
-		battlefield[x][y] = WATER
-		indexDir := rand.IntN(3)
-
-		for {
-			nextDir := directions[indexDir]
-			nextX, nextY := x+nextDir[0], y+nextDir[1]
-			if checkNextPosition(battlefield, nextX, nextY) != 3 {
-				x = nextX
-				y = nextY
-				break
-			} else if indexDir >= 3 {
-				indexDir = 0
-			} else {
-				indexDir++
-			}
-		}
-		size--
-
-	}
+	return baseStyle
 }
 
-func buildWalls(battlefield [][]int) {
-	x := rand.IntN(len(battlefield))
-	y := rand.IntN(len(battlefield[0]))
-
-	directions := [][]int{
-		{0, 1},
-		{1, 0},
-		{0, -1},
-		{-1, 0},
+func NewModel() model {
+	b := Battlefield.NewBattleField(2, 3)
+	m := model{
+		bfield: b,
 	}
+	m.cursor.x = 0
+	m.cursor.y = 0
+	//m.style = DefaultStyles(m)
 
-	battlefield[x][y] = WALL
-	indexDir := rand.IntN(3)
-
-	for i := 1; i < maxWallsCells; i++ {
-		nextX := x + directions[indexDir][0]
-		nextY := y + directions[indexDir][1]
-
-		if checkNextPosition(battlefield, nextX, nextY) != 3 {
-			battlefield[nextX][nextY] = WALL
-			x = nextX
-			y = nextY
-		} else {
-			break
+	// Table Styling
+	m.table = table.New().Border(lipgloss.NormalBorder()).BorderRow(true)
+	for rIdx, row := range b {
+		var newRow []string
+		for cIdx := range row {
+			i := strconv.Itoa(b[rIdx][cIdx])
+			newRow = append(newRow, i)
 		}
+		m.table.Row(newRow...)
 	}
+
+	m.table.StyleFunc(func(row, col int) lipgloss.Style {
+		var colorStyle lipgloss.Style
+		switch {
+
+		case m.bfield[row-1][col] == 0:
+			return colorStyle.Background(lipgloss.Color(landColor)).Padding(0, 1, 0).Foreground(lipgloss.Color(letterColor))
+		case m.bfield[row-1][col] == 1:
+			return colorStyle.Background(lipgloss.Color(waterColor)).Padding(0, 1, 0).Foreground(lipgloss.Color(letterColor))
+		case m.bfield[row-1][col] == 2:
+			return colorStyle.Background(lipgloss.Color(wallColor)).Padding(0, 1, 0).Foreground(lipgloss.Color(letterColor))
+		default:
+			return colorStyle.Background(lipgloss.Color(outboundColor)).Padding(0, 1, 0).Foreground(lipgloss.Color(letterColor))
+		}
+	})
+	Battlefield.LogBattlefield(m.bfield)
+	return m
 }
 
-func drawMap(battlefield [][]int) error {
-	if len(battlefield) == 0 {
-		return errors.New("Not correct shape of battlefield")
-	}
-
-	for i := 0; i < len(battlefield)*2+3; i++ {
-		fmt.Printf("-")
-	}
-	fmt.Printf("\n")
-	for row := 0; row < len(battlefield); row++ {
-		fmt.Printf("| ")
-		for column := 0; column < len(battlefield[row]); column++ {
-			fmt.Printf("%d ", battlefield[row][column])
-		}
-		fmt.Printf("|\n")
-	}
-
-	for i := 0; i < len(battlefield)*2+3; i++ {
-		fmt.Printf("-")
-	}
+func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func checkNextPosition(battlefield [][]int, nextX int, nextY int) int {
-	// Will return number of next cell, 3 if it is out of bounds.
-	if nextX >= 0 && nextX < len(battlefield) && nextY >= 0 && nextY < len(battlefield[0]) {
-		return battlefield[nextX][nextY]
-	} else {
-		return OUTBOUNDS
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	directions := [][]int{
+		{0, 1},
+		{1, 0},
+		{0, -1},
+		{-1, 0},
+	}
+	var nextX, nextY int
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+		case "up", "k":
+			nextX, nextY = m.cursor.x+directions[0][0], m.cursor.y+directions[0][1]
+		case "down", "j":
+			nextX, nextY = m.cursor.x+directions[2][0], m.cursor.y+directions[2][1]
+
+		case "left", "a":
+			nextX, nextY = m.cursor.x+directions[3][0], m.cursor.y+directions[3][1]
+
+		case "right", "d":
+			nextX, nextY = m.cursor.x+directions[1][0], m.cursor.y+directions[1][1]
+		}
+		nextPosition := Battlefield.CheckNextPosition(m.bfield, nextX, nextY)
+		if nextPosition == Battlefield.LAND {
+			m.cursor.x = nextX
+			m.cursor.y = nextY
+		}
+		return m, nil
+	}
+	return m, nil
+}
+
+func (m model) View() string {
+	return lipgloss.JoinVertical(
+		lipgloss.Center,
+		m.table.Render(),
+	)
+}
+
+func Run() {
+	m := NewModel()
+	p := tea.NewProgram(&m, tea.WithAltScreen())
+	_, err := p.Run()
+	if err != nil {
+		log.Fatalln("(-) Error starting the program: ", err)
 	}
 }
 
 func main() {
-	field := buildMap(3, 2)
-	drawMap(field)
-
+	Run()
 }
