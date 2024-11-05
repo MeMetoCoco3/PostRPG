@@ -53,7 +53,7 @@ func buildLake(battlefield [][]int, size int) {
 		for {
 			nextDir := directions[indexDir]
 			nextX, nextY := x+nextDir[0], y+nextDir[1]
-			if nextX < len(battlefield) && nextX >= 0 && nextY < len(battlefield[0]) && nextY >= 0 {
+			if checkNextPosition(battlefield, nextX, nextY) != 3 {
 				x = nextX
 				y = nextY
 				break
@@ -86,7 +86,7 @@ func buildWalls(battlefield [][]int) {
 		nextX := x + directions[indexDir][0]
 		nextY := y + directions[indexDir][1]
 
-		if nextX >= 0 && nextX < len(battlefield) && nextY >= 0 && nextY < len(battlefield[0]) {
+		if checkNextPosition(battlefield, nextX, nextY) != 3 {
 			battlefield[nextX][nextY] = WALL
 			x = nextX
 			y = nextY
