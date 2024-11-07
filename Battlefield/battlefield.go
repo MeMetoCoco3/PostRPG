@@ -140,11 +140,10 @@ func LogBattlefield(battlefield [][]int) {
 
 }
 
-func CheckNextPosition(battlefield [][]int, nextX int, nextY int) int {
-	// Will return number of next cell, 3 if it is out of bounds.
-	if nextX >= 0 && nextX < len(battlefield) && nextY >= 0 && nextY < len(battlefield[0]) {
-		return battlefield[nextX][nextY]
-	} else {
-		return OUTBOUNDS
+// Will return number of next cell, 3 if it is out of bounds.
+func CheckNextPosition(battlefield [][]int, x, y int) int {
+	if x < 0 || y < 0 || x >= len(battlefield) || y >= len(battlefield[0]) {
+		return 3
 	}
+	return battlefield[y][x]
 }
