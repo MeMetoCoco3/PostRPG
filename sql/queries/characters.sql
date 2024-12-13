@@ -1,7 +1,7 @@
 -- name: CreateNewCharacter :one
 INSERT INTO characters (id, health, mana, stamina, strength, job, name, skill_id, weapon_id, icon) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,

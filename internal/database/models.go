@@ -5,33 +5,31 @@
 package database
 
 import (
-	"database/sql"
-
 	"github.com/google/uuid"
 )
 
 type Character struct {
 	ID       uuid.UUID
-	Health   sql.NullInt32
-	Mana     sql.NullInt32
-	Stamina  sql.NullInt32
-	Strength sql.NullInt32
-	Job      sql.NullInt32
-	Name     sql.NullString
+	Health   int32
+	Mana     int32
+	Stamina  int32
+	Strength int32
+	Job      int32
+	Name     string
 	SkillID  uuid.NullUUID
 	WeaponID uuid.NullUUID
-	Icon     sql.NullString
+	Icon     string
 }
 
 type Skill struct {
 	ID          uuid.UUID
-	Coin        sql.NullString
-	AmountToPay sql.NullInt32
-	Damage      sql.NullInt32
-	Role        sql.NullInt32
-	Reach       sql.NullInt32
-	Name        sql.NullString
-	Description sql.NullString
+	Coin        string
+	AmountToPay int32
+	Damage      int32
+	Role        int32
+	Reach       int32
+	Name        string
+	Description string
 }
 
 type Terrain struct {
@@ -41,9 +39,9 @@ type Terrain struct {
 
 type Weapon struct {
 	ID          uuid.UUID
-	Name        sql.NullString
-	Description sql.NullString
-	Damage      sql.NullInt32
-	Reach       sql.NullInt32
-	Role        sql.NullInt32
+	Name        string
+	Description string
+	Damage      int32
+	Reach       int32
+	Role        int32
 }

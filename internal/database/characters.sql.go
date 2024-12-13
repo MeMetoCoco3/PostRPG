@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -15,7 +14,7 @@ import (
 const createNewCharacter = `-- name: CreateNewCharacter :one
 INSERT INTO characters (id, health, mana, stamina, strength, job, name, skill_id, weapon_id, icon) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,
@@ -30,15 +29,15 @@ RETURNING id, health, mana, stamina, strength, job, name, skill_id, weapon_id, i
 `
 
 type CreateNewCharacterParams struct {
-	Health   sql.NullInt32
-	Mana     sql.NullInt32
-	Stamina  sql.NullInt32
-	Strength sql.NullInt32
-	Job      sql.NullInt32
-	Name     sql.NullString
+	Health   int32
+	Mana     int32
+	Stamina  int32
+	Strength int32
+	Job      int32
+	Name     string
 	SkillID  uuid.NullUUID
 	WeaponID uuid.NullUUID
-	Icon     sql.NullString
+	Icon     string
 }
 
 func (q *Queries) CreateNewCharacter(ctx context.Context, arg CreateNewCharacterParams) (Character, error) {

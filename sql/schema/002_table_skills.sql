@@ -6,7 +6,7 @@ CREATE TABLE skills (
     damage INT NOT NULL,
     role INT NOT NULL,
     reach INT NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     description  TEXT  NOT NULL
 );
 

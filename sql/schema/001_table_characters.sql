@@ -6,7 +6,7 @@ CREATE TABLE characters (
     stamina INT NOT NULL,
     strength INT NOT NULL,
     job INT NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     skill_id UUID,
     weapon_id UUID,
     icon TEXT NOT NULL

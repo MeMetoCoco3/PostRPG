@@ -1,7 +1,7 @@
 -- name: CreateNewSkill :one
 INSERT INTO skills (id, damage, reach, coin, amount_to_pay, name, description, role) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,

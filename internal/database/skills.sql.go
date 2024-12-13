@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -15,7 +14,7 @@ import (
 const createNewSkill = `-- name: CreateNewSkill :one
 INSERT INTO skills (id, damage, reach, coin, amount_to_pay, name, description, role) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,
@@ -28,13 +27,13 @@ RETURNING id, coin, amount_to_pay, damage, role, reach, name, description
 `
 
 type CreateNewSkillParams struct {
-	Damage      sql.NullInt32
-	Reach       sql.NullInt32
-	Coin        sql.NullString
-	AmountToPay sql.NullInt32
-	Name        sql.NullString
-	Description sql.NullString
-	Role        sql.NullInt32
+	Damage      int32
+	Reach       int32
+	Coin        string
+	AmountToPay int32
+	Name        string
+	Description string
+	Role        int32
 }
 
 func (q *Queries) CreateNewSkill(ctx context.Context, arg CreateNewSkillParams) (Skill, error) {

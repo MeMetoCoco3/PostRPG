@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -15,7 +14,7 @@ import (
 const createNewWeapon = `-- name: CreateNewWeapon :one
 INSERT INTO weapons (id, damage, reach, name, description, role) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,
@@ -26,11 +25,11 @@ RETURNING id, name, description, damage, reach, role
 `
 
 type CreateNewWeaponParams struct {
-	Damage      sql.NullInt32
-	Reach       sql.NullInt32
-	Name        sql.NullString
-	Description sql.NullString
-	Role        sql.NullInt32
+	Damage      int32
+	Reach       int32
+	Name        string
+	Description string
+	Role        int32
 }
 
 func (q *Queries) CreateNewWeapon(ctx context.Context, arg CreateNewWeaponParams) (Weapon, error) {

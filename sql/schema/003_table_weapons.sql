@@ -2,11 +2,11 @@
 
 CREATE TABLE weapons(
     id UUID PRIMARY KEY,
-    name TEXT,
-    description TEXT,
-    damage INT,
-    reach INT,
-    role INT
+    name TEXT UNIQUE NOT NULL,
+    description TEXT NOT NULL,
+    damage INT NOT NULL,
+    reach INT NOT NULL,
+    role INT NOT NULL
 );
 
 -- +goose Down

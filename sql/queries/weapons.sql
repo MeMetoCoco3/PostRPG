@@ -1,7 +1,7 @@
 -- name: CreateNewWeapon :one
 INSERT INTO weapons (id, damage, reach, name, description, role) 
 VALUES (
-	get_random_uuid(),
+	gen_random_uuid(),
 	$1,
 	$2,
 	$3,
