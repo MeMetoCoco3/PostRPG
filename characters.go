@@ -54,17 +54,40 @@ func NewCharacter(name string, job Role, icon string) *Character {
 		Name:     name,
 		Icon:     icon,
 	}
+
 	return c
 }
 
 func (c *Character) UploadToDb(db *database.Queries) (*Character, error) {
 	ctx := context.Background()
 	data, err := db.CreateNewCharacter(ctx, c.ToParams())
-	DealWithError(err)
+	err = DealWithError(err, "Database Upload")
 
 	character := ParamsToCharacter(data)
 
-	return character, nil
+	return character, err
+}
+
+func (c *Character) GetWeapon(db *database.Queries, weaponID uuid.UUID) error {
+	ctx := context.Background()
+	err := db.AssignWeapon(ctx, database.AssignWeaponParams{
+		ID:       c.ID,
+		WeaponID: ToNullUUID(weaponID),
+	})
+	err = DealWithError(err, "Assign weapon to character")
+	c.Weapon = weaponID
+	return err
+}
+
+func (c *Character) GetSkill(db *database.Queries, skillID uuid.UUID) error {
+	ctx := context.Background()
+	err := db.AssignSkill(ctx, database.AssignSkillParams{
+		ID:      c.ID,
+		SkillID: ToNullUUID(skillID),
+	})
+	err = DealWithError(err, "Asign skill to character")
+	c.Skill = skillID
+	return err
 }
 
 func (c *Character) ToParams() database.CreateNewCharacterParams {
@@ -88,8 +111,8 @@ func ParamsToCharacter(data database.Character) *Character {
 		Strength: int(data.Strength),
 		Job:      int(data.Job),
 		Name:     data.Name,
-		Skill:    uuid.Nil,
-		Weapon:   uuid.Nil,
+		Skill:    data.SkillID.UUID,
+		Weapon:   data.WeaponID.UUID,
 		Icon:     data.Icon,
 	}
 }

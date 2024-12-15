@@ -7,7 +7,7 @@ import (
 )
 
 type Skill struct {
-	Id          uuid.UUID `json:"id"`
+	ID          uuid.UUID `json:"id"`
 	AmountToPay int
 	Coin        string
 	Damage      int    `json:"damage"`
@@ -32,10 +32,10 @@ func NewSkill(name string, description string, damage int, reach int, role Role,
 func (s *Skill) UploadToDb(db *database.Queries) (*Skill, error) {
 	ctx := context.Background()
 	data, err := db.CreateNewSkill(ctx, s.ToParams())
-	DealWithError(err)
+	err = DealWithError(err, "Uploading skill to database")
 
 	newSkill := ParamsToSkill(data)
-	return newSkill, nil
+	return newSkill, err
 }
 
 func (s *Skill) ToParams() database.CreateNewSkillParams {
@@ -52,6 +52,7 @@ func (s *Skill) ToParams() database.CreateNewSkillParams {
 
 func ParamsToSkill(data database.Skill) *Skill {
 	return &Skill{
+		ID:          data.ID,
 		Damage:      int(data.Damage),
 		Reach:       int(data.Reach),
 		Coin:        data.Coin,

@@ -11,6 +11,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const assignSkill = `-- name: AssignSkill :exec
+UPDATE characters SET skill_id = $1 WHERE characters.id = $2
+`
+
+type AssignSkillParams struct {
+	SkillID uuid.NullUUID
+	ID      uuid.UUID
+}
+
+func (q *Queries) AssignSkill(ctx context.Context, arg AssignSkillParams) error {
+	_, err := q.db.ExecContext(ctx, assignSkill, arg.SkillID, arg.ID)
+	return err
+}
+
+const assignWeapon = `-- name: AssignWeapon :exec
+UPDATE characters SET weapon_id = $1 WHERE characters.id = $2
+`
+
+type AssignWeaponParams struct {
+	WeaponID uuid.NullUUID
+	ID       uuid.UUID
+}
+
+func (q *Queries) AssignWeapon(ctx context.Context, arg AssignWeaponParams) error {
+	_, err := q.db.ExecContext(ctx, assignWeapon, arg.WeaponID, arg.ID)
+	return err
+}
+
 const createNewCharacter = `-- name: CreateNewCharacter :one
 INSERT INTO characters (id, health, mana, stamina, strength, job, name, skill_id, weapon_id, icon) 
 VALUES (

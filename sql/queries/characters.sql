@@ -20,5 +20,11 @@ SELECT * FROM CHARACTERS WHERE id = $1;
 -- name: DeleteAllCharacters :exec
 DELETE FROM characters;
 
+-- name: AssignWeapon :exec
+UPDATE characters SET weapon_id = $1 WHERE characters.id = $2;
+
+-- name: AssignSkill :exec
+UPDATE characters SET skill_id = $1 WHERE characters.id = $2;
+
 -- name: DeleteOneCharacter :exec
 DELETE FROM characters WHERE id = $1;

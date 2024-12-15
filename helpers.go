@@ -2,8 +2,9 @@ package main
 
 import (
 	"database/sql"
-
+	"fmt"
 	"github.com/google/uuid"
+	"log"
 )
 
 type Role int
@@ -14,6 +15,14 @@ const (
 	ARCHER
 )
 
+func DealWithError(err error, message string) error {
+	if err != nil {
+		// Log the error with additional context
+		log.Printf("%s: %v", message, err)
+		return fmt.Errorf("%s: %w", message, err)
+	}
+	return nil
+}
 func ToNullString(s string) sql.NullString {
 	return sql.NullString{
 		String: s,
@@ -24,7 +33,7 @@ func ToNullString(s string) sql.NullString {
 func ToNullUUID(u uuid.UUID) uuid.NullUUID {
 	return uuid.NullUUID{
 		UUID:  u,
-		Valid: u != uuid.Nil,
+		Valid: true,
 	}
 }
 

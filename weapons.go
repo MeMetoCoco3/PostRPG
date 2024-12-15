@@ -28,10 +28,10 @@ func NewWeapon(name string, description string, damage int, reach int, role Role
 func (w *Weapon) UploadToDb(db *database.Queries) (*Weapon, error) {
 	ctx := context.Background()
 	data, err := db.CreateNewWeapon(ctx, w.ToParams())
-	DealWithError(err)
+	err = DealWithError(err, "Uploading weapon to database")
 
 	newWeapon := ParamsToWeapon(data)
-	return newWeapon, nil
+	return newWeapon, err
 }
 
 func (w *Weapon) ToParams() database.CreateNewWeaponParams {
@@ -46,6 +46,7 @@ func (w *Weapon) ToParams() database.CreateNewWeaponParams {
 
 func ParamsToWeapon(data database.Weapon) *Weapon {
 	return &Weapon{
+		ID:          data.ID,
 		Damage:      int(data.Damage),
 		Reach:       int(data.Reach),
 		Name:        data.Name,
