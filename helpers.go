@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"math"
 )
 
 type Role int
@@ -22,6 +23,10 @@ const (
 	WEAPON
 	SKILL
 )
+
+func DistanceBetweenTwoPoints(x1, y1, x2, y2 int) int {
+	return int(math.Abs(float64(x1-x2))) + int(math.Abs(float64(y1-y2)))
+}
 
 func DealWithError(err error, message string) error {
 	if err != nil {
