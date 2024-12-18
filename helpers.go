@@ -15,6 +15,14 @@ const (
 	ARCHER
 )
 
+type Action int
+
+const (
+	ATTACK Action = iota
+	WEAPON
+	SKILL
+)
+
 func DealWithError(err error, message string) error {
 	if err != nil {
 		// Log the error with additional context
@@ -30,6 +38,7 @@ func ToNullString(s string) sql.NullString {
 	}
 }
 
+// TODO: Valid may be u!=uuid.nil
 func ToNullUUID(u uuid.UUID) uuid.NullUUID {
 	return uuid.NullUUID{
 		UUID:  u,

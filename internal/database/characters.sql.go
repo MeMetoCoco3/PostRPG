@@ -115,7 +115,7 @@ func (q *Queries) DeleteOneCharacter(ctx context.Context, id uuid.UUID) error {
 }
 
 const getCharacter = `-- name: GetCharacter :one
-SELECT id, health, mana, stamina, strength, job, name, skill_id, weapon_id, icon FROM CHARACTERS WHERE id = $1
+SELECT id, health, mana, stamina, strength, job, name, skill_id, weapon_id, icon FROM characters WHERE id = $1
 `
 
 func (q *Queries) GetCharacter(ctx context.Context, id uuid.UUID) (Character, error) {
@@ -134,4 +134,18 @@ func (q *Queries) GetCharacter(ctx context.Context, id uuid.UUID) (Character, er
 		&i.Icon,
 	)
 	return i, err
+}
+
+const setHealth = `-- name: SetHealth :exec
+UPDATE characters SET health = $1 WHERE characters.id = $2
+`
+
+type SetHealthParams struct {
+	Health int32
+	ID     uuid.UUID
+}
+
+func (q *Queries) SetHealth(ctx context.Context, arg SetHealthParams) error {
+	_, err := q.db.ExecContext(ctx, setHealth, arg.Health, arg.ID)
+	return err
 }

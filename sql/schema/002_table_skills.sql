@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE skills (
     id UUID PRIMARY KEY,
-    coin TEXT  NOT NULL,
+    coin TEXT NOT NULL,
     amount_to_pay INT  NOT NULL,
     damage INT NOT NULL,
     role INT NOT NULL,

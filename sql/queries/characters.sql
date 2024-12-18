@@ -15,10 +15,10 @@ VALUES (
 RETURNING *;
 
 -- name: GetCharacter :one
-SELECT * FROM CHARACTERS WHERE id = $1;
+SELECT * FROM characters WHERE id = $1;
 
--- name: DeleteAllCharacters :exec
-DELETE FROM characters;
+-- name: SetHealth :exec
+UPDATE characters SET health = $1 WHERE characters.id = $2;
 
 -- name: AssignWeapon :exec
 UPDATE characters SET weapon_id = $1 WHERE characters.id = $2;
@@ -28,3 +28,6 @@ UPDATE characters SET skill_id = $1 WHERE characters.id = $2;
 
 -- name: DeleteOneCharacter :exec
 DELETE FROM characters WHERE id = $1;
+
+-- name: DeleteAllCharacters :exec
+DELETE FROM characters;
