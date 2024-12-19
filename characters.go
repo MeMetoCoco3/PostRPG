@@ -9,15 +9,16 @@ import (
 
 type Character struct {
 	ID       uuid.UUID `json:"id"`
-	Health   int       `json:"health"`
-	Mana     int       `json:"mana"`
-	Stamina  int       `json:"stamina"`
-	Strength int       `json:"strength"`
-	Role     Role      `json:"role"`
-	Name     string    `json:"name"`
-	Skill    *Skill    `json:"skill"`
-	Weapon   *Weapon   `json:"weapon"`
-	Icon     string    `json:"icon"`
+	Position Position
+	Health   int     `json:"health"`
+	Mana     int     `json:"mana"`
+	Stamina  int     `json:"stamina"`
+	Strength int     `json:"strength"`
+	Role     Role    `json:"role"`
+	Name     string  `json:"name"`
+	Skill    *Skill  `json:"skill"`
+	Weapon   *Weapon `json:"weapon"`
+	Icon     string  `json:"icon"`
 }
 
 func NewCharacter(name string, job Role, icon string) *Character {
@@ -97,6 +98,35 @@ func (c *Character) GetSkill(db *database.Queries, s *Skill) error {
 	return err
 }
 
+func (c *Character) Move(db *database.Queries, p Position) error {
+	ctx := context.Background()
+	result, err := db.CheckPosition(ctx, database.CheckPositionParams{
+		X: int32(p.X),
+		Y: int32(p.Y),
+	})
+	if err != nil {
+		DealWithError(err, "(-) Error encountered: Checking the position while moving: %s")
+		return err
+	}
+	if result.Character.Valid {
+		return fmt.Errorf("(-) Error encountered: A character(%s) is already in position (%d,%d)", result.Character.String, p.X, p.Y)
+	}
+
+	err = db.SetNull(ctx, database.SetNullParams{X: int32(c.Position.X), Y: int32(c.Position.Y)})
+	if err != nil {
+		return err
+	}
+	err = db.MoveCharacter(ctx, database.MoveCharacterParams{
+		Character: ToNullString(c.Icon),
+		X:         int32(p.X),
+		Y:         int32(p.Y),
+	})
+
+	DealWithError(err, "(-) Error encountered: Error moving the character to Postgres DB\n")
+	c.Position = p
+	return nil
+}
+
 func (c *Character) Attack(db *database.Queries, objective *Character, action Action) error {
 	ctx := context.Background()
 	newHealth := objective.Health
@@ -104,22 +134,28 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 	case ATTACK:
 		// TODO:CHECK REACH
 		if c.Stamina < 1 {
-			return fmt.Errorf("Character does not have enough stamina.\n")
+			return fmt.Errorf("(-) Character does not have enough stamina.\n")
 		}
 		newHealth -= c.Strength
 		c.Stamina--
 	case WEAPON:
+		if c.Weapon == nil {
+			return fmt.Errorf("(-) Character does not have weapon.\n")
+		}
 		// TODO: CHECK REACH
 		if c.Stamina < 2 {
-			return fmt.Errorf("Character does not have enough stamina.\n")
+			return fmt.Errorf("(-) Character does not have enough stamina.\n")
 		}
 		if c.Weapon == nil {
-			return fmt.Errorf("Character does not have a weapon.\n")
+			return fmt.Errorf("(-) Character does not have a weapon.\n")
 		}
 		newHealth -= (c.Strength + c.Weapon.Damage)
 		c.Stamina -= 2
 	case SKILL:
 		// TODO: CHECK REACH
+		if c.Skill == nil {
+			return fmt.Errorf("(-) Character does not have skill.\n")
+		}
 		switch c.Skill.Coin {
 		case "MANA":
 			if c.Skill.AmountToPay > c.Mana {

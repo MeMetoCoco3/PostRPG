@@ -24,6 +24,11 @@ const (
 	SKILL
 )
 
+type Position struct {
+	X int
+	Y int
+}
+
 func DistanceBetweenTwoPoints(x1, y1, x2, y2 int) int {
 	return int(math.Abs(float64(x1-x2))) + int(math.Abs(float64(y1-y2)))
 }

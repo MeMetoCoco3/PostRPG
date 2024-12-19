@@ -5,8 +5,55 @@
 package database
 
 import (
+	"database/sql"
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/google/uuid"
 )
+
+type TerrainType string
+
+const (
+	TerrainTypeWALL  TerrainType = "WALL"
+	TerrainTypeGRASS TerrainType = "GRASS"
+	TerrainTypeWATER TerrainType = "WATER"
+)
+
+func (e *TerrainType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TerrainType(s)
+	case string:
+		*e = TerrainType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TerrainType: %T", src)
+	}
+	return nil
+}
+
+type NullTerrainType struct {
+	TerrainType TerrainType
+	Valid       bool // Valid is true if TerrainType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTerrainType) Scan(value interface{}) error {
+	if value == nil {
+		ns.TerrainType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TerrainType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTerrainType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TerrainType), nil
+}
 
 type Character struct {
 	ID       uuid.UUID
@@ -21,6 +68,13 @@ type Character struct {
 	Icon     string
 }
 
+type Map struct {
+	X         int32
+	Y         int32
+	Terrain   NullTerrainType
+	Character sql.NullString
+}
+
 type Skill struct {
 	ID          uuid.UUID
 	Coin        string
@@ -30,11 +84,6 @@ type Skill struct {
 	Reach       int32
 	Name        string
 	Description string
-}
-
-type Terrain struct {
-	ID     int32
-	Matrix [][]int32
 }
 
 type Weapon struct {
