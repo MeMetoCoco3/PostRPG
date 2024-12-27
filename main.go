@@ -69,5 +69,13 @@ func main() {
 		fmt.Printf("Character is in position (%d,%d)\n", terrainInfo.X, terrainInfo.Y)
 	}
 
+	_ = char1.Move(dbQueries, Position{X: 1, Y: 2})
+	_ = char2.Move(dbQueries, Position{X: 1, Y: 3})
+	err = char2.Attack(dbQueries, char1, ATTACK)
+	fmt.Println(err)
+	err = char2.Move(dbQueries, Position{X: 1, Y: 2})
+	fmt.Println(err)
+	// TODO: SetWeapons null
+	// TODO: SetSkills null
 	dbQueries.SetAllNull(ctx)
 }

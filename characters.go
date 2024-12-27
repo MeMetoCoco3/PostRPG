@@ -132,10 +132,16 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 	newHealth := objective.Health
 	switch action {
 	case ATTACK:
-		// TODO:CHECK REACH
+
 		if c.Stamina < 1 {
 			return fmt.Errorf("(-) Character does not have enough stamina.\n")
 		}
+
+		distanceX, distanceY := DistanceBetweenTwoPoints(c.Position.X, c.Position.Y, objective.Position.X, objective.Position.Y)
+		if distanceX > 1 || distanceY > 1 {
+			return fmt.Errorf("(-) Character is to far.\n")
+		}
+
 		newHealth -= c.Strength
 		c.Stamina--
 	case WEAPON:

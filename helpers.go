@@ -29,8 +29,8 @@ type Position struct {
 	Y int
 }
 
-func DistanceBetweenTwoPoints(x1, y1, x2, y2 int) int {
-	return int(math.Abs(float64(x1-x2))) + int(math.Abs(float64(y1-y2)))
+func DistanceBetweenTwoPoints(x1, y1, x2, y2 int) (int, int) {
+	return int(math.Abs(float64(x1 - x2))), int(math.Abs(float64(y1 - y2)))
 }
 
 func DealWithError(err error, message string) error {
