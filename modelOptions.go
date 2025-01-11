@@ -11,6 +11,17 @@ type modelOptions struct {
 	OptionsCursor int
 }
 
+func NewModelOptions() modelOptions {
+	return modelOptions{
+		Options: []string{
+			"USE SKILL",
+			"USE WEAPON",
+			"SAVE",
+		},
+		OptionsCursor: 0,
+	}
+}
+
 func (m modelOptions) Init() tea.Cmd {
 	return nil
 }

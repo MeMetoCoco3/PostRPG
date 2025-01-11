@@ -13,6 +13,22 @@ type modelLog struct {
 	EscapeCodes []string
 }
 
+func NewModelLogger() modelLog {
+	return modelLog{
+		Log: []string{"", "", "", "", "", "", ""},
+		EscapeCodes: []string{
+			"\033[38;5;255m", // Bright White
+			"\033[38;5;252m", // Light Gray
+			"\033[38;5;246m", // Gray
+			"\033[38;5;240m", // Dark Gray
+			"\033[38;5;238m", // Darker Gray
+			"\033[38;5;236m", // Very Dark Gray
+			"\033[38;5;234m", // Almost Black
+		},
+	}
+
+}
+
 func (m modelLog) Init() tea.Cmd {
 	return nil
 }

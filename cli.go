@@ -1,20 +1,18 @@
 package main
 
 import (
-	"PostRPG/Battlefield"
-	_ "fmt"
+	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 const (
 	landColor     = "#4C956C"
+	enemyColor    = "#00FF0F"
 	waterColor    = "#0B598D"
 	wallColor     = "#A89D9E"
 	outboundColor = "#FF0090"
@@ -46,46 +44,16 @@ func DefaultStyles(m model) lipgloss.Style {
 }
 
 func NewModel() *model {
+	mB := NewModelBattlefield()
+	mO := NewModelOptions()
+	mL := NewModelLogger()
 	m := &model{
-		Battlefield: modelBattlefield{
-			Bfield: Battlefield.NewBattleField(2, 3),
-			Cursor: struct{ x, y int }{x: 0, y: 1},
-		},
-		OptionsList: modelOptions{
-			Options: []string{
-				"USE SKILL",
-				"USE WEAPON",
-			},
-			OptionsCursor: 0,
-		},
-		Logger: modelLog{
-			Log: []string{"", "", "", "", "", "", ""},
-			EscapeCodes: []string{
-				"\033[38;5;255m", // Bright White
-				"\033[38;5;252m", // Light Gray
-				"\033[38;5;246m", // Gray
-				"\033[38;5;240m", // Dark Gray
-				"\033[38;5;238m", // Darker Gray
-				"\033[38;5;236m", // Very Dark Gray
-				"\033[38;5;234m", // Almost Black
-			},
-		},
-		State: BATTLEFIELD,
+		Battlefield: mB,
+		OptionsList: mO,
+		Logger:      mL,
+		State:       BATTLEFIELD,
 	}
 
-	// Table Styling
-	m.Battlefield.Table = table.New().Border(lipgloss.NormalBorder()).BorderRow(true)
-	for rIdx, row := range m.Battlefield.Bfield {
-		var newRow []string
-		for cIdx := range row {
-			i := strconv.Itoa(m.Battlefield.Bfield[rIdx][cIdx])
-			newRow = append(newRow, i)
-		}
-		m.Battlefield.Table.Row(newRow...)
-	}
-	m.Battlefield.applyColorChange()
-
-	Battlefield.LogBattlefield(m.Battlefield.Bfield)
 	return m
 }
 
@@ -112,7 +80,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch m.State {
 	case BATTLEFIELD:
+		currentPosition := m.Battlefield.Character.Position
 		m.Battlefield = *GetBattlefieldType(m.Battlefield.Update(msg))
+		if currentPosition != m.Battlefield.Character.Position {
+			m.Logger.AddToLog(fmt.Sprintf("Player moved to new position: %v", m.Battlefield.Character.Position))
+		}
 		return m, nil
 	case OPTIONS:
 		m.OptionsList = *GetOptionsType(m.OptionsList.Update(msg))

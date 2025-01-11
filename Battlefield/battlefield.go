@@ -20,6 +20,8 @@ const (
 	OUTBOUNDS
 )
 
+type Position struct{ X, Y int }
+
 func NewBattleField(lakes int, buildings int) [][]int {
 	array := make([][]int, 10)
 
@@ -34,6 +36,7 @@ func NewBattleField(lakes int, buildings int) [][]int {
 	for i := 0; i < buildings; i++ {
 		buildWalls(array)
 	}
+
 	return array
 }
 
@@ -66,7 +69,6 @@ func buildLake(battlefield [][]int, size int) {
 			}
 		}
 		size--
-
 	}
 }
 

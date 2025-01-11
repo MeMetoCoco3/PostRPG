@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"PostRPG/internal/database"
 	"context"
@@ -9,6 +10,7 @@ import (
 	_ "github.com/lib/pq"
 	"os"
 )
+
 
 func main() {
 	fmt.Println("MAIN")
@@ -87,3 +89,4 @@ func main() {
 	// TODO: SetSkills null
 	dbQueries.SetAllNull(ctx)
 }
+*/
