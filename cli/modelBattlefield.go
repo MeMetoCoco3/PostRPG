@@ -20,11 +20,11 @@ type modelBattlefield struct {
 	Table *table.Table
 }
 
-func (m modelBattlefield) Init() tea.Cmd {
+func (m *modelBattlefield) Init() tea.Cmd {
 	return nil
 }
 
-func (m modelBattlefield) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelBattlefield) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	directions := [][]int{
 		{0, -1},
 		{1, 0},
@@ -60,14 +60,13 @@ func (m modelBattlefield) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func GetBattlefieldType(m tea.Model, c tea.Cmd) modelBattlefield {
-	battlefieldModel := m.(modelBattlefield)
+func GetBattlefieldType(m tea.Model, c tea.Cmd) *modelBattlefield {
+	battlefieldModel := m.(*modelBattlefield)
 	return battlefieldModel
 }
 
-func (m modelBattlefield) View() string {
+func (m *modelBattlefield) View() string {
 	return m.Table.Render()
-
 }
 
 func (m *modelBattlefield) applyColorChange() {
