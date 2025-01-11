@@ -34,24 +34,27 @@ func main() {
 	skill2 := NewSkill("Petrolox", "Ostion brutal", 20, 1, WARRIOR, 23, "STAMINA")
 	skill3 := NewSkill("SomeBullshit", "Bla", 1, 2, WIZZARD, 1, "jajaj")
 	skill1, err = skill1.UploadToDb(dbQueries)
-	fmt.Println(err)
+	//fmt.Println(err)
 	skill2, err = skill2.UploadToDb(dbQueries)
-	fmt.Println(err)
+	//fmt.Println(err)
 	skill3, err = skill3.UploadToDb(dbQueries)
-	fmt.Println(err)
+	//fmt.Println(err)
 	char1 := NewCharacter("Vidal El Rey", WARRIOR, "$")
 	char2 := NewCharacter("Katerina", WIZZARD, "A")
 	char1, err = char1.UploadToDb(dbQueries)
-	fmt.Println(err)
+	//fmt.Println(err)
 	char2, err = char2.UploadToDb(dbQueries)
-	fmt.Println(err)
+	//fmt.Println(err)
 	char1.GetWeapon(dbQueries, weapon1)
-	err = char2.GetSkill(dbQueries, skill2)
+	fmt.Println(char1.Weapon)
+	err = char2.GetSkill(dbQueries, skill1)
 	fmt.Println(err)
 	fmt.Println(char2.Skill)
-	fmt.Println(weapon1)
-	fmt.Println(char1.Weapon)
-	err = char2.Attack(dbQueries, char1, SKILL)
+	//fmt.Println(err)
+	//fmt.Println(char2.Skill)
+	//fmt.Println(weapon1)
+	//fmt.Println(char1.Weapon)
+	err = char1.Attack(dbQueries, char2, WEAPON)
 
 	positions := []Position{
 		{X: 1, Y: 3},
@@ -63,18 +66,23 @@ func main() {
 
 	for _, position := range positions {
 		err = char1.Move(dbQueries, position)
-		fmt.Println(err)
-		terrainInfo, err := dbQueries.GetCharacterPosition(ctx, ToNullString(char1.Icon))
-		fmt.Println(err)
-		fmt.Printf("Character is in position (%d,%d)\n", terrainInfo.X, terrainInfo.Y)
+		_, _ = dbQueries.GetCharacterPosition(ctx, ToNullString(char1.Icon))
+		// fmt.Printf("Character is in position (%d,%d)\n", terrainInfo.X, terrainInfo.Y)
 	}
 
 	_ = char1.Move(dbQueries, Position{X: 1, Y: 2})
 	_ = char2.Move(dbQueries, Position{X: 1, Y: 3})
-	err = char2.Attack(dbQueries, char1, ATTACK)
-	fmt.Println(err)
+	fmt.Println(char2.Weapon)
+
+	err = char1.Attack(dbQueries, char2, WEAPON)
+	err = char2.Attack(dbQueries, char1, SKILL)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = char2.Move(dbQueries, Position{X: 1, Y: 2})
-	fmt.Println(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// TODO: SetWeapons null
 	// TODO: SetSkills null
 	dbQueries.SetAllNull(ctx)

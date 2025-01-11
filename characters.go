@@ -132,7 +132,6 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 	newHealth := objective.Health
 	switch action {
 	case ATTACK:
-
 		if c.Stamina < 1 {
 			return fmt.Errorf("(-) Character does not have enough stamina.\n")
 		}
@@ -144,6 +143,8 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 
 		newHealth -= c.Strength
 		c.Stamina--
+		fmt.Printf("%s attacked %s and inflicted %d of damage.\n", c.Name, objective.Name, c.Strength)
+
 	case WEAPON:
 		if c.Weapon == nil {
 			return fmt.Errorf("(-) Character does not have weapon.\n")
@@ -155,8 +156,11 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 		if c.Weapon == nil {
 			return fmt.Errorf("(-) Character does not have a weapon.\n")
 		}
-		newHealth -= (c.Strength + c.Weapon.Damage)
+		damage := (c.Strength + c.Weapon.Damage)
+		newHealth -= damage
 		c.Stamina -= 2
+		fmt.Printf("%s attacked %s with %s and inflicted %d of damage.\n", c.Name, objective.Name, c.Weapon.Name, damage)
+
 	case SKILL:
 		// TODO: CHECK REACH
 		if c.Skill == nil {
@@ -176,10 +180,9 @@ func (c *Character) Attack(db *database.Queries, objective *Character, action Ac
 		default:
 			return fmt.Errorf("Not correct coin for skill.\n")
 		}
-		if c.Skill == nil {
-			return fmt.Errorf("Character does not have a skill.\n")
-		}
-		newHealth = newHealth - (c.Strength + c.Skill.Damage)
+		damage := c.Strength + c.Skill.Damage
+		newHealth -= damage
+		fmt.Printf("%s attacked %s with %s and inflicted %d of damage.\n", c.Name, objective.Name, c.Skill.Name, damage)
 	default:
 		return fmt.Errorf("Character.Attack method: This action is not allowed.\n")
 	}

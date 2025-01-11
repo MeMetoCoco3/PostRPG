@@ -2,14 +2,14 @@ package main
 
 import (
 	"PostRPG/Battlefield"
-	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
+	_ "fmt"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"log"
 	"os"
 	"strconv"
-	_ "strings"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 const (
@@ -22,23 +22,20 @@ const (
 	letterColor   = "#322F20"
 )
 
+type State uint8
+
+const (
+	BATTLEFIELD State = iota
+	OPTIONS
+)
+
 type model struct {
-	bfield [][]int
-	cursor struct {
-		x int
-		y int
-	}
-	style lipgloss.Style
-	table *table.Table
+	Battlefield modelBattlefield
+	OptionsList modelOptions
+	State       State
 }
 
-/*
-	type Styles struct {
-		BorderColor lipglosrs.Color
-		InputField  lipgloss.Style
-	}
-*/
-//For the future
+// TODO:
 func DefaultStyles(m model) lipgloss.Style {
 	re := lipgloss.NewRenderer(os.Stdout)
 	baseStyle := re.NewStyle().Border(lipgloss.DoubleBorder())
@@ -47,30 +44,35 @@ func DefaultStyles(m model) lipgloss.Style {
 }
 
 func NewModel() model {
-	b := Battlefield.NewBattleField(2, 3)
-	/*
-		bHeader := make([]int, len(b[0]))
-		b = append([][]int{bHeader}, b...)
-	*/
 	m := model{
-		bfield: b,
+		Battlefield: modelBattlefield{
+			Bfield: Battlefield.NewBattleField(2, 3),
+			Cursor: struct{ x, y int }{x: 0, y: 1},
+		},
+		OptionsList: modelOptions{
+			Options: []string{
+				"ATTACK",
+				"USE SKILL",
+				"USE WEAPON",
+			},
+			OptionsCursor: 0,
+		},
+		State: BATTLEFIELD,
 	}
-	m.cursor.x = 0
-	m.cursor.y = 1
 
 	// Table Styling
-	m.table = table.New().Border(lipgloss.NormalBorder()).BorderRow(true)
-	for rIdx, row := range b {
+	m.Battlefield.Table = table.New().Border(lipgloss.NormalBorder()).BorderRow(true)
+	for rIdx, row := range m.Battlefield.Bfield {
 		var newRow []string
 		for cIdx := range row {
-			i := strconv.Itoa(b[rIdx][cIdx])
+			i := strconv.Itoa(m.Battlefield.Bfield[rIdx][cIdx])
 			newRow = append(newRow, i)
 		}
-		m.table.Row(newRow...)
+		m.Battlefield.Table.Row(newRow...)
 	}
-	m.applyColorChange()
+	m.Battlefield.applyColorChange()
 
-	Battlefield.LogBattlefield(m.bfield)
+	Battlefield.LogBattlefield(m.Battlefield.Bfield)
 	return m
 }
 
@@ -79,67 +81,36 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	directions := [][]int{
-		{0, -1},
-		{1, 0},
-		{0, 1},
-		{-1, 0},
-	}
-	var nextX, nextY int
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "up", "k":
-			nextX, nextY = m.cursor.x+directions[0][0], m.cursor.y+directions[0][1]
-		case "down", "j":
-			nextX, nextY = m.cursor.x+directions[2][0], m.cursor.y+directions[2][1]
-		case "left", "a":
-			nextX, nextY = m.cursor.x+directions[3][0], m.cursor.y+directions[3][1]
-
-		case "right", "d":
-			nextX, nextY = m.cursor.x+directions[1][0], m.cursor.y+directions[1][1]
+		case "tab":
+			if m.State == BATTLEFIELD {
+				m.State = OPTIONS
+			} else {
+				m.State = BATTLEFIELD
+			}
 		}
-		nextPosition := Battlefield.CheckNextPosition(m.bfield, nextX, nextY-1)
-
-		fmt.Printf("%d:%d= %d", nextX, nextY, nextPosition)
-		if nextPosition == Battlefield.LAND {
-			m.cursor.x = nextX
-			m.cursor.y = nextY
-			m.applyColorChange()
-		}
-		return m, nil
 	}
-	return m, nil
+
+	switch m.State {
+	case BATTLEFIELD:
+		m.Battlefield = GetBattlefieldType(m.Battlefield.Update(msg))
+		return m, nil
+	case OPTIONS:
+		m.OptionsList = GetOptionsType(m.OptionsList.Update(msg))
+		return m, nil
+	default:
+		panic("NOT CORRECT STATE")
+	}
 }
 
 func (m model) View() string {
-
-	return lipgloss.JoinVertical(
+	return lipgloss.JoinHorizontal(
 		lipgloss.Center,
-		m.table.Render(),
+		m.Battlefield.View(),
+		lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(m.OptionsList.View()),
 	)
-}
-
-func (m *model) applyColorChange() {
-	m.table.StyleFunc(func(row, col int) lipgloss.Style {
-		var colorStyle lipgloss.Style
-		if col == m.cursor.x && row == m.cursor.y {
-			return colorStyle.Background(lipgloss.Color(playerColor)).Padding(0, 1, 0).Bold(true)
-		}
-		switch {
-		case m.bfield[row-1][col] == 0:
-			return colorStyle.Foreground(lipgloss.Color(landColor)).Padding(0, 1, 0).Bold(true)
-		case m.bfield[row-1][col] == 1:
-			return colorStyle.Foreground(lipgloss.Color(waterColor)).Padding(0, 1, 0).Bold(true)
-		case m.bfield[row-1][col] == 2:
-			return colorStyle.Foreground(lipgloss.Color(wallColor)).Padding(0, 1, 0).Bold(true)
-		default:
-			return colorStyle.Foreground(lipgloss.Color(outboundColor)).Padding(0, 1, 0).Bold(true)
-		}
-	})
-
 }
 
 func Run() {
@@ -150,3 +121,5 @@ func Run() {
 		log.Fatalln("(-) Error starting the program: ", err)
 	}
 }
+
+func main() { Run() }
