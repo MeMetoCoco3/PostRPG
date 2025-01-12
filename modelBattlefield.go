@@ -3,7 +3,6 @@ package main
 import (
 	"PostRPG/Battlefield"
 	"PostRPG/internal/database"
-	_ "fmt"
 	"strconv"
 
 	"github.com/charmbracelet/lipgloss"
@@ -15,13 +14,11 @@ import (
 type modelBattlefield struct {
 	Bfield    [][]int
 	Character Character
-	Enemies   []struct {
-		x int
-		y int
-	}
-	Style lipgloss.Style
-	Table *table.Table
-	DB    *database.Queries
+	Enemies   []*Character
+	Parent    *model
+	Style     lipgloss.Style
+	Table     *table.Table
+	DB        *database.Queries
 }
 
 func (m *modelBattlefield) Init() tea.Cmd {
@@ -30,11 +27,12 @@ func (m *modelBattlefield) Init() tea.Cmd {
 
 func NewModelBattlefield() modelBattlefield {
 	dbConexion := GetConexion()
+	enemies := GetEnemies(3, []int{5, 6, 7}, []int{5, 6, 7})
 
 	mB := modelBattlefield{
 		Bfield:    Battlefield.NewBattleField(2, 3),
 		Character: *NewCharacter("Vidal", WARRIOR, "$"),
-		Enemies:   []struct{ x, y int }{{x: 5, y: 7}, {x: 4, y: 7}, {x: 6, y: 7}, {x: 5, y: 8}},
+		Enemies:   enemies,
 		DB:        dbConexion,
 	}
 
@@ -82,6 +80,12 @@ func (m *modelBattlefield) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		nextPosition := Battlefield.CheckNextPosition(m.Bfield, nextX, nextY-1)
 
 		if nextPosition == Battlefield.LAND {
+			for _, enemy := range m.Enemies {
+				if enemy.Position.X == nextX && enemy.Position.Y == nextY {
+					m.Parent.Logger.AddToLog("Colision against " + enemy.Name)
+					return m, nil
+				}
+			}
 			m.Character.Position.X = nextX
 			m.Character.Position.Y = nextY
 			m.applyColorChange()
@@ -108,7 +112,7 @@ func (m *modelBattlefield) applyColorChange() {
 			return colorStyle.Background(lipgloss.Color(playerColor)).Padding(0, 1, 0).Bold(true)
 		} else {
 			for _, enemy := range m.Enemies {
-				if col == enemy.x && row == enemy.y {
+				if col == enemy.Position.X && row == enemy.Position.Y {
 					return colorStyle.Background(lipgloss.Color(enemyColor)).Padding(0, 1, 0).Bold(true)
 				}
 			}
@@ -125,4 +129,15 @@ func (m *modelBattlefield) applyColorChange() {
 			return colorStyle.Foreground(lipgloss.Color(outboundColor)).Padding(0, 1, 0).Bold(true)
 		}
 	})
+}
+
+func (m *modelBattlefield) DeleteEnemy(index int) {
+	enemies := m.Enemies
+	if index == len(enemies)-1 {
+		enemies = enemies[:index]
+	} else {
+		enemies = append(enemies[:index], enemies[index+1:]...)
+	}
+
+	m.Enemies = enemies
 }

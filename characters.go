@@ -224,6 +224,24 @@ func ParamsToCharacter(data database.Character) *Character {
 	}
 }
 
+func GetEnemies(n int, xs []int, ys []int) []*Character {
+	if n > 3 {
+		return nil
+	}
+
+	enemies := []*Character{}
+	names := []string{"Alicuecano", "Alcornoque", "Albacete"}
+	icons := []string{"!", "?", "8"}
+
+	for i := 0; i < n; i++ {
+		newEnemy := NewCharacter(names[i], WARRIOR, icons[i])
+		newEnemy.Position.X = xs[i]
+		newEnemy.Position.Y = ys[i]
+		enemies = append(enemies, newEnemy)
+	}
+	return enemies
+}
+
 /*
 //  From the time I got trolled for not using UNIQUE/NotNull constraints in my fucking sqlc queries.
 
@@ -254,6 +272,7 @@ func ParamsToCharacter(data database.Character) *Character {
 		}
 	}
 */
+
 func (c *Character) PrintStats() {
 	fmt.Println("🌟 Character Sheet 🌟")
 	fmt.Println("--------------------")

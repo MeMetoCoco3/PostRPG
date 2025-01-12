@@ -9,6 +9,7 @@ import (
 type modelOptions struct {
 	Options       []string
 	OptionsCursor int
+	Parent        *model
 }
 
 func NewModelOptions() modelOptions {
@@ -56,6 +57,23 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.OptionsCursor++
+		case "enter":
+			switch m.Options[m.OptionsCursor] {
+			case "USE SKILL":
+				m.Parent.Logger.AddToLog("We are using a skill.")
+			case "USE WEAPON":
+				x := m.Parent.Battlefield.Character.Position.X
+				y := m.Parent.Battlefield.Character.Position.Y
+
+				for i, enemy := range m.Parent.Battlefield.Enemies {
+					if dx, dy := DistanceBetweenTwoPoints(x, y, enemy.Position.X, enemy.Position.Y); (dx == 0 && dy == 1) || (dy == 0 && dx == 1) {
+						m.Parent.Logger.AddToLog("We are attaking " + enemy.Name)
+						m.Parent.Battlefield.DeleteEnemy(i)
+					}
+				}
+			case "SAVE":
+				m.Parent.Logger.AddToLog("We are saving.")
+			}
 		}
 	}
 	return m, nil

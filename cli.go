@@ -16,7 +16,8 @@ const (
 	waterColor    = "#0B598D"
 	wallColor     = "#A89D9E"
 	outboundColor = "#FF0090"
-	playerColor   = "#FF0000"
+	attackPointer = "#FF0000"
+	playerColor   = "#FFFF00"
 	borderColor   = "#322F20"
 	letterColor   = "#322F20"
 )
@@ -53,7 +54,8 @@ func NewModel() *model {
 		Logger:      mL,
 		State:       BATTLEFIELD,
 	}
-
+	m.Battlefield.Parent = m
+	m.OptionsList.Parent = m
 	return m
 }
 
