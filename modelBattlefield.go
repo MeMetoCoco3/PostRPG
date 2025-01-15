@@ -3,6 +3,7 @@ package main
 import (
 	"PostRPG/Battlefield"
 	"PostRPG/internal/database"
+	"fmt"
 	"strconv"
 
 	"github.com/charmbracelet/lipgloss"
@@ -12,13 +13,14 @@ import (
 )
 
 type modelBattlefield struct {
-	Bfield    [][]int
-	Character Character
-	Enemies   []*Character
-	Parent    *model
-	Style     lipgloss.Style
-	Table     *table.Table
-	DB        *database.Queries
+	Bfield     [][]int
+	AttackMode *[]Position
+	Character  Character
+	Enemies    []*Character
+	Parent     *model
+	Style      lipgloss.Style
+	Table      *table.Table
+	DB         *database.Queries
 }
 
 func (m *modelBattlefield) Init() tea.Cmd {
@@ -106,8 +108,22 @@ func (m *modelBattlefield) View() string {
 }
 
 func (m *modelBattlefield) applyColorChange() {
+
+	if m.AttackMode == nil {
+		fmt.Println("m.AttackMode is nil")
+	} else if *m.AttackMode == nil {
+		fmt.Println("*m.AttackMode is nil")
+	} else {
+		fmt.Printf("AttackMode positions: %+v\n", *m.AttackMode)
+	}
+
+	fmt.Printf("m.Battlefield.AttackMode: %+v\n", m.AttackMode)
+
+	// Maybe in the future i will take out everything related to paint enemies and player out of here and put it outside,
+	// because its to much checkking
+
+	var colorStyle lipgloss.Style
 	m.Table.StyleFunc(func(row, col int) lipgloss.Style {
-		var colorStyle lipgloss.Style
 		if col == m.Character.Position.X && row == m.Character.Position.Y {
 			return colorStyle.Background(lipgloss.Color(playerColor)).Padding(0, 1, 0).Bold(true)
 		} else {
@@ -115,6 +131,15 @@ func (m *modelBattlefield) applyColorChange() {
 				if col == enemy.Position.X && row == enemy.Position.Y {
 					return colorStyle.Background(lipgloss.Color(enemyColor)).Padding(0, 1, 0).Bold(true)
 				}
+			}
+		}
+
+		if m.Parent.OptionsList.OnAttackMode && m.AttackMode != nil {
+			for _, position := range *m.AttackMode {
+				if col == position.X && row == position.Y {
+					return colorStyle.Background(lipgloss.Color(attackColor)).Padding(0, 1, 0).Bold(true)
+				}
+
 			}
 		}
 
@@ -129,6 +154,7 @@ func (m *modelBattlefield) applyColorChange() {
 			return colorStyle.Foreground(lipgloss.Color(outboundColor)).Padding(0, 1, 0).Bold(true)
 		}
 	})
+
 }
 
 func (m *modelBattlefield) DeleteEnemy(index int) {

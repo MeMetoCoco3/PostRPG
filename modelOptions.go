@@ -1,6 +1,7 @@
 package main
 
 import (
+	"PostRPG/Battlefield"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,6 +10,8 @@ import (
 type modelOptions struct {
 	Options       []string
 	OptionsCursor int
+	OnAttackMode  bool
+	AttackMode    *[]Position
 	Parent        *model
 }
 
@@ -20,6 +23,7 @@ func NewModelOptions() modelOptions {
 			"SAVE",
 		},
 		OptionsCursor: 0,
+		OnAttackMode:  false,
 	}
 }
 
@@ -64,19 +68,40 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "USE WEAPON":
 				x := m.Parent.Battlefield.Character.Position.X
 				y := m.Parent.Battlefield.Character.Position.Y
+				m.OnAttackMode = true
 
-				for i, enemy := range m.Parent.Battlefield.Enemies {
-					if dx, dy := DistanceBetweenTwoPoints(x, y, enemy.Position.X, enemy.Position.Y); (dx == 0 && dy == 1) || (dy == 0 && dx == 1) {
-						m.Parent.Logger.AddToLog("We are attaking " + enemy.Name)
-						m.Parent.Battlefield.DeleteEnemy(i)
+				// CHECK direction of ATTACK
+				cnt := 0
+				for _, direction := range Directions {
+					checkPosX := x + direction.X
+					checkPosY := y + direction.Y
+					if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 {
+						(*m.AttackMode)[cnt] = Position{X: checkPosX, Y: checkPosX}
 					}
 				}
+
+				/*
+					for i, enemy := range m.Parent.Battlefield.Enemies {
+						if dx, dy := DistanceBetweenTwoPoints(x, y, enemy.Position.X, enemy.Position.Y); (dx == 0 && dy == 1) || (dy == 0 && dx == 1) {
+							m.Parent.Logger.AddToLog("We are attaking " + enemy.Name)
+							m.Parent.Battlefield.DeleteEnemy(i)
+						}
+					}
+				*/
 			case "SAVE":
 				m.Parent.Logger.AddToLog("We are saving.")
 			}
 		}
 	}
 	return m, nil
+}
+
+func (m *modelOptions) DeleteAttackMode() {
+
+	m.OnAttackMode = false
+	emptyAttack := make([]Position, 4)
+	m.Parent.Battlefield.AttackMode = &emptyAttack
+	m.AttackMode = &emptyAttack
 }
 
 func GetOptionsType(m tea.Model, c tea.Cmd) *modelOptions {

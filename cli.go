@@ -19,6 +19,7 @@ const (
 	attackPointer = "#FF0000"
 	playerColor   = "#FFFF00"
 	borderColor   = "#322F20"
+	attackColor   = "#7B0828"
 	letterColor   = "#322F20"
 )
 
@@ -56,6 +57,20 @@ func NewModel() *model {
 	}
 	m.Battlefield.Parent = m
 	m.OptionsList.Parent = m
+
+	onRangeToAttack := make([]Position, 4)
+
+	m.Battlefield.AttackMode = &onRangeToAttack
+	m.OptionsList.AttackMode = &onRangeToAttack
+
+	if m.Battlefield.AttackMode == nil {
+		fmt.Println("m.AttackMode is nil")
+	} else if *m.Battlefield.AttackMode == nil {
+		fmt.Println("*m.AttackMode is nil")
+	} else {
+		fmt.Printf("AttackMode positions: %+v\n", *m.Battlefield.AttackMode)
+	}
+
 	return m
 }
 
@@ -105,6 +120,13 @@ func (m *model) View() string {
 
 func Run() {
 	m := NewModel()
+	if m.Battlefield.AttackMode == nil {
+		fmt.Println("m.AttackMode is nil")
+	} else if *m.Battlefield.AttackMode == nil {
+		fmt.Println("*m.AttackMode is nil")
+	} else {
+		fmt.Printf("AttackMode positions: %+v\n", *m.Battlefield.AttackMode)
+	}
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	_, err := p.Run()
 	if err != nil {
