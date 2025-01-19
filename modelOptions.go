@@ -2,15 +2,14 @@ package main
 
 import (
 	"PostRPG/Battlefield"
-	"strings"
-
+	_ "fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	"strings"
 )
 
 type modelOptions struct {
 	Options       []string
 	OptionsCursor int
-	OnAttackMode  bool
 	AttackMode    *[]Position
 	Parent        *model
 }
@@ -23,7 +22,6 @@ func NewModelOptions() modelOptions {
 			"SAVE",
 		},
 		OptionsCursor: 0,
-		OnAttackMode:  false,
 	}
 }
 
@@ -46,6 +44,7 @@ func (m *modelOptions) View() string {
 func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		m.DeleteAttackMode()
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
@@ -61,6 +60,7 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.OptionsCursor++
+
 		case "enter":
 			switch m.Options[m.OptionsCursor] {
 			case "USE SKILL":
@@ -68,16 +68,22 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "USE WEAPON":
 				x := m.Parent.Battlefield.Character.Position.X
 				y := m.Parent.Battlefield.Character.Position.Y
-				m.OnAttackMode = true
 
 				// CHECK direction of ATTACK
-				cnt := 0
 				for _, direction := range Directions {
+
 					checkPosX := x + direction.X
 					checkPosY := y + direction.Y
-					if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 {
-						(*m.AttackMode)[cnt] = Position{X: checkPosX, Y: checkPosX}
+					if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 || checkPosY == LenBattlefield {
+						(*m.AttackMode) = append((*m.AttackMode), Position{X: checkPosX, Y: checkPosY})
+
 					}
+
+					/*
+						if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 {
+							(*m.AttackMode)[cnt] = Position{X: checkPosX, Y: checkPosX}
+						}
+					*/
 				}
 
 				/*
@@ -97,10 +103,7 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *modelOptions) DeleteAttackMode() {
-
-	m.OnAttackMode = false
-	emptyAttack := make([]Position, 4)
-	m.Parent.Battlefield.AttackMode = &emptyAttack
+	emptyAttack := []Position{}
 	m.AttackMode = &emptyAttack
 }
 

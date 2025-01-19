@@ -11,16 +11,17 @@ import (
 )
 
 const (
-	landColor     = "#4C956C"
-	enemyColor    = "#00FF0F"
-	waterColor    = "#0B598D"
-	wallColor     = "#A89D9E"
-	outboundColor = "#FF0090"
-	attackPointer = "#FF0000"
-	playerColor   = "#FFFF00"
-	borderColor   = "#322F20"
-	attackColor   = "#7B0828"
-	letterColor   = "#322F20"
+	backgroundColor = "#000000"
+	landColor       = "#4C956C"
+	enemyColor      = "#00FF0F"
+	waterColor      = "#0B598D"
+	wallColor       = "#A89D9E"
+	outboundColor   = "#FF0090"
+	attackPointer   = "#FF0000"
+	playerColor     = "#FFFF00"
+	borderColor     = "#322F20"
+	attackColor     = "#7B0828"
+	letterColor     = "#322F20"
 )
 
 type State uint8
@@ -46,9 +47,16 @@ func DefaultStyles(m model) lipgloss.Style {
 }
 
 func NewModel() *model {
+	//fmt.Println("Start")
 	mB := NewModelBattlefield()
+
+	//fmt.Println("MB DONE")
 	mO := NewModelOptions()
+
+	//fmt.Println("MO DONE")
 	mL := NewModelLogger()
+
+	//fmt.Println("ML DONE")
 	m := &model{
 		Battlefield: mB,
 		OptionsList: mO,
@@ -56,21 +64,10 @@ func NewModel() *model {
 		State:       BATTLEFIELD,
 	}
 	m.Battlefield.Parent = m
+
 	m.OptionsList.Parent = m
 
-	onRangeToAttack := make([]Position, 4)
-
-	m.Battlefield.AttackMode = &onRangeToAttack
-	m.OptionsList.AttackMode = &onRangeToAttack
-
-	if m.Battlefield.AttackMode == nil {
-		fmt.Println("m.AttackMode is nil")
-	} else if *m.Battlefield.AttackMode == nil {
-		fmt.Println("*m.AttackMode is nil")
-	} else {
-		fmt.Printf("AttackMode positions: %+v\n", *m.Battlefield.AttackMode)
-	}
-
+	mB.applyColorChangeInit()
 	return m
 }
 
@@ -79,6 +76,7 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -111,6 +109,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) View() string {
+
 	return lipgloss.JoinHorizontal(
 		lipgloss.Center,
 		m.Battlefield.View(),
@@ -120,13 +119,7 @@ func (m *model) View() string {
 
 func Run() {
 	m := NewModel()
-	if m.Battlefield.AttackMode == nil {
-		fmt.Println("m.AttackMode is nil")
-	} else if *m.Battlefield.AttackMode == nil {
-		fmt.Println("*m.AttackMode is nil")
-	} else {
-		fmt.Printf("AttackMode positions: %+v\n", *m.Battlefield.AttackMode)
-	}
+
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	_, err := p.Run()
 	if err != nil {
