@@ -2,6 +2,7 @@
 - IA
 - Levels
 - Combat
+- Stats
 
 
 If doubts, check the AddToLog

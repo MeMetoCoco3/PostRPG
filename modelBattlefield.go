@@ -119,14 +119,26 @@ func (m *modelBattlefield) applyColorChange() {
 			return colorStyle.Background(lipgloss.Color(playerColor)).Padding(0, 1, 0).Bold(true)
 		} else {
 
+			if m.Parent.OptionsList.Aiming {
+
+				if len(*m.Parent.OptionsList.EnemiesOnRange) > 0 && m.Parent.OptionsList.AimPosition.Position.X == col && m.Parent.OptionsList.AimPosition.Position.Y == row {
+					return colorStyle.Background(lipgloss.Color(aimingColor)).Padding(0, 1, 0).Bold(true)
+				}
+
+				for _, position := range *m.Parent.OptionsList.AttackMode {
+					if col == position.X && row == position.Y {
+						return colorStyle.Background(lipgloss.Color(attackColor)).Padding(0, 1, 0).Bold(true)
+					}
+				}
+			}
 			for _, enemy := range m.Enemies {
 				if col == enemy.Position.X && row == enemy.Position.Y {
+
 					return colorStyle.Background(lipgloss.Color(enemyColor)).Padding(0, 1, 0).Bold(true)
 				}
 			}
 		}
-
-		if m.Parent.OptionsList.OptionsCursor == 1 && m.Parent.State == OPTIONS {
+		if m.Parent.OptionsList.Aiming {
 			for _, position := range *m.Parent.OptionsList.AttackMode {
 				if col == position.X && row == position.Y {
 

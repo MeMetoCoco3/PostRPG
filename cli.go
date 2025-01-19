@@ -18,6 +18,7 @@ const (
 	wallColor       = "#A89D9E"
 	outboundColor   = "#FF0090"
 	attackPointer   = "#FF0000"
+	aimingColor     = "#FFF000"
 	playerColor     = "#FFFF00"
 	borderColor     = "#322F20"
 	attackColor     = "#7B0828"
@@ -81,6 +82,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
+			if m.OptionsList.Aiming {
+				m.OptionsList.DeleteAttackMode()
+			}
 			if m.State == BATTLEFIELD {
 				m.State = OPTIONS
 				m.Logger.AddToLog("You are now in Options")
@@ -89,6 +93,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Logger.AddToLog("You are now in Battlefield")
 			}
 		case "q", "Q":
+			if m.OptionsList.Aiming {
+				m.OptionsList.Update(msg)
+				return m, nil
+			}
+
 			return m, tea.Quit
 		}
 	}
@@ -96,13 +105,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.State {
 	case BATTLEFIELD:
 		currentPosition := m.Battlefield.Character.Position
-		m.Battlefield = *GetBattlefieldType(m.Battlefield.Update(msg))
+		m.Battlefield.Update(msg)
 		if currentPosition != m.Battlefield.Character.Position {
 			m.Logger.AddToLog(fmt.Sprintf("Player moved to new position: %v", m.Battlefield.Character.Position))
 		}
 		return m, nil
 	case OPTIONS:
-		m.OptionsList = *GetOptionsType(m.OptionsList.Update(msg))
+		m.OptionsList.Update(msg)
 		return m, nil
 	}
 	return m, nil

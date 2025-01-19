@@ -2,27 +2,35 @@ package main
 
 import (
 	"PostRPG/Battlefield"
-	_ "fmt"
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"strings"
 )
 
 type modelOptions struct {
-	Options       []string
-	OptionsCursor int
-	AttackMode    *[]Position
-	Parent        *model
+	Options        []string
+	OptionsCursor  int
+	AimCursor      int
+	Aiming         bool
+	AimPosition    *Character
+	EnemiesOnRange *[]Character
+	AttackMode     *[]Position
+	Parent         *model
 }
 
 func NewModelOptions() modelOptions {
-	return modelOptions{
+	mO := modelOptions{
 		Options: []string{
 			"USE SKILL",
 			"USE WEAPON",
 			"SAVE",
 		},
 		OptionsCursor: 0,
+		AimCursor:     0,
+		Aiming:        false,
 	}
+	mO.DeleteAttackMode()
+	return mO
 }
 
 func (m modelOptions) Init() tea.Cmd {
@@ -44,24 +52,60 @@ func (m *modelOptions) View() string {
 func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		m.DeleteAttackMode()
 		switch msg.String() {
 		case "ctrl+c", "q":
+			if m.Aiming {
+				m.DeleteAttackMode()
+				return m, nil
+			}
 			return m, tea.Quit
 		case "up", "k":
+			if m.Aiming {
+				return m, nil
+			}
 			if m.OptionsCursor <= 0 {
 				m.OptionsCursor = 0
 				return m, nil
 			}
 			m.OptionsCursor--
 		case "down", "j":
+			if m.Aiming {
+				return m, nil
+			}
 			if m.OptionsCursor >= len(m.Options)-1 {
 				m.OptionsCursor = len(m.Options) - 1
 				return m, nil
 			}
 			m.OptionsCursor++
 
+		case "left", "a":
+			closeEnemiesCounter := len(*m.EnemiesOnRange)
+			if m.Aiming && closeEnemiesCounter > 0 {
+				if m.AimCursor <= 0 {
+					m.AimCursor = closeEnemiesCounter - 1
+				} else {
+					m.AimCursor--
+				}
+				m.AimPosition = &(*m.EnemiesOnRange)[m.AimCursor]
+				return m, nil
+			}
+
+		case "right", "d":
+			closeEnemiesCounter := len(*m.EnemiesOnRange)
+			if m.Aiming && closeEnemiesCounter > 0 {
+				if m.AimCursor >= closeEnemiesCounter-1 {
+					m.AimCursor = 0
+				} else {
+					m.AimCursor++
+				}
+				m.AimPosition = &(*m.EnemiesOnRange)[m.AimCursor]
+				return m, nil
+			}
+
 		case "enter":
+			if m.Aiming {
+				return m, nil
+			}
 			switch m.Options[m.OptionsCursor] {
 			case "USE SKILL":
 				m.Parent.Logger.AddToLog("We are using a skill.")
@@ -76,24 +120,15 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					checkPosY := y + direction.Y
 					if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 || checkPosY == LenBattlefield {
 						(*m.AttackMode) = append((*m.AttackMode), Position{X: checkPosX, Y: checkPosY})
-
-					}
-
-					/*
-						if val := Battlefield.CheckNextPosition(m.Parent.Battlefield.Bfield, checkPosX, checkPosY); val != 3 {
-							(*m.AttackMode)[cnt] = Position{X: checkPosX, Y: checkPosX}
+						for _, enemy := range m.Parent.Battlefield.Enemies {
+							if enemy.Position.X == checkPosX && enemy.Position.Y == checkPosY {
+								(*m.EnemiesOnRange) = append((*m.EnemiesOnRange), *enemy)
+								m.AimPosition = &(*m.EnemiesOnRange)[0]
+							}
 						}
-					*/
+					}
+					m.Aiming = true
 				}
-
-				/*
-					for i, enemy := range m.Parent.Battlefield.Enemies {
-						if dx, dy := DistanceBetweenTwoPoints(x, y, enemy.Position.X, enemy.Position.Y); (dx == 0 && dy == 1) || (dy == 0 && dx == 1) {
-							m.Parent.Logger.AddToLog("We are attaking " + enemy.Name)
-							m.Parent.Battlefield.DeleteEnemy(i)
-						}
-					}
-				*/
 			case "SAVE":
 				m.Parent.Logger.AddToLog("We are saving.")
 			}
@@ -104,10 +139,19 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *modelOptions) DeleteAttackMode() {
 	emptyAttack := []Position{}
+	emptyEnemiesOnRange := []Character{}
+	m.Aiming = false
 	m.AttackMode = &emptyAttack
+	m.EnemiesOnRange = &emptyEnemiesOnRange
 }
 
 func GetOptionsType(m tea.Model, c tea.Cmd) *modelOptions {
 	optionsModel := m.(*modelOptions)
 	return optionsModel
+}
+
+func (m *modelOptions) GetEnemiesOnSight() []Character {
+
+	fmt.Println("Jamones")
+	return nil
 }
