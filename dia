@@ -1,0 +1,125 @@
+[33mcommit 8bc16fa52c0d158d40f1fe3360469c6bfb453909[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sun Jan 19 23:33:16 2025 +0100
+
+    Now I can aim!
+
+[33mcommit 53234aa4c420035db42bba95c78e7aa3a969ea7d[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sun Jan 19 17:37:30 2025 +0100
+
+    debugged some stuff fixed bugs, and finally can see where to attack
+
+[33mcommit 5d5d2314ee32eb79c316987bee1c814fd2d24e56[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Wed Jan 15 21:58:35 2025 +0100
+
+    Getting attack done
+
+[33mcommit a73e1dbc084046286c9df63fac29e38c94570c54[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sun Jan 12 18:03:51 2025 +0100
+
+    Parent model and more interaction in battlefield with enemies
+
+[33mcommit 646f5a1bb6b6d3c386af3d67b510bb0d063822cd[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sat Jan 11 23:33:28 2025 +0100
+
+    New stuff
+
+[33mcommit 8501199fbb3434fec29693c5ae1cb065ae45cb1f[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sat Jan 11 19:34:59 2025 +0100
+
+    new model log with cute gradient
+
+[33mcommit 7e6f34d11db86f7ce15e8235accf34f040dacb97[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sat Jan 11 13:02:16 2025 +0100
+
+    Second windows and refactor for modularity between models.
+
+[33mcommit 5c5d4ada86e998ce7982741f3014c881026731f2[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Fri Dec 27 21:17:34 2024 +0100
+
+    Distance between characters and tests  refactored. Attack  checks range
+
+[33mcommit 6832f35c095e183bff645982758aab48dba9a2a1[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Thu Dec 19 21:59:43 2024 +0100
+
+    We can move, some extra queries for map checking and some testing features
+
+[33mcommit c0f5d1943db115ced8392b245e1e9d134ee806a7[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Wed Dec 18 01:21:33 2024 +0100
+
+    added distance between two points and test for it
+
+[33mcommit b892184167c80d4026f96120eaff119db7a3c627[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Wed Dec 18 01:02:12 2024 +0100
+
+    Added Attacks
+
+[33mcommit 09ec5a19fc7c5a9294471decf28e9c97eec603d7[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sun Dec 15 19:02:45 2024 +0100
+
+    Characters can get skills and weapons, plus better error handling
+
+[33mcommit e81119aad6eeac10df6ff96a90d875e4c47d2c5f[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Sat Dec 14 00:43:33 2024 +0100
+
+    refactorizacio finalizada, modificaciones en las tablas y queries
+
+[33mcommit 061ad1f5202d49409140fa9ade775784a1b66921[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Fri Dec 13 23:41:01 2024 +0100
+
+    Refactorizando
+
+[33mcommit 9bde91398095524a04f692678f155cd030eae6c3[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Wed Dec 11 08:11:59 2024 +0000
+
+    first migrations done
+
+[33mcommit 15db8b78972d66d8289e82dc81eddb0e27c241b0[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Tue Dec 10 23:36:49 2024 +0000
+
+    Getting crazy with json constraints!
+
+[33mcommit 5c82918d9a898c2282bbcfcfd4e19a02fc702a1e[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Mon Dec 9 22:17:41 2024 +0000
+
+    up to date
+
+[33mcommit f6a25116de6b9f2d7f5e145379b7206cafbefeaa[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Thu Nov 7 23:34:09 2024 +0100
+
+    Map working, movement working!
+
+[33mcommit 3d9dc74a61facc98fa41f03e868e6a7f6e099035[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Fri Oct 11 02:02:04 2024 +0200
+
+    Almost grid with Charm
+
+[33mcommit b59621080b439fd3fb1d819fa1c509c90e2803f7[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Tue Nov 5 22:22:03 2024 +0100
+
+    Added checkNextPosition()
+
+[33mcommit 6ba79b77e46af6fb602e53eee713f7fcd163f442[m
+Author: MeMetoCoco3 <torresmartinezvidal@gmail.com>
+Date:   Tue Nov 5 22:14:08 2024 +0100
+
+    firstCommit

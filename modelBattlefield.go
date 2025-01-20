@@ -4,11 +4,10 @@ import (
 	"PostRPG/Battlefield"
 	"PostRPG/internal/database"
 	"fmt"
-	_ "log"
-	"strconv"
-
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
+	_ "log"
+	"strconv"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -191,13 +190,23 @@ func (m *modelBattlefield) applyColorChangeInit() {
 
 }
 
-func (m *modelBattlefield) DeleteEnemy(index int) {
+func (m *modelBattlefield) DeleteEnemy(enemy *Character) {
 	enemies := m.Enemies
-	if index == len(enemies)-1 {
-		enemies = enemies[:index]
-	} else {
-		enemies = append(enemies[:index], enemies[index+1:]...)
+	var killedEnemyIndex int
+	for i, e := range enemies {
+		if enemy.Position == e.Position {
+			killedEnemyIndex = i
+		}
 	}
 
-	m.Enemies = enemies
+	numberOfEnemies := len(enemies)
+	if numberOfEnemies == 1 {
+		m.Enemies = []*Character{}
+		m.Parent.Logger.AddToLog("All enemies dead!")
+	} else if killedEnemyIndex == numberOfEnemies-1 {
+		m.Enemies = enemies[:killedEnemyIndex]
+	} else {
+		m.Enemies = append(enemies[:killedEnemyIndex], enemies[killedEnemyIndex+1:]...)
+	}
+
 }

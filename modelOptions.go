@@ -104,7 +104,16 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			if m.Aiming {
-				return m, nil
+				if len(*m.EnemiesOnRange) == 0 {
+					m.Parent.Logger.AddToLog("No enemies on sight!")
+					m.DeleteAttackMode()
+					return m, nil
+				} else {
+					m.Parent.Logger.AddToLog(fmt.Sprintf("You dealt a fatal blow to %s", (*m.EnemiesOnRange)[m.AimCursor].Name))
+					m.Parent.Battlefield.DeleteEnemy(&(*m.EnemiesOnRange)[m.AimCursor])
+					m.DeleteAttackMode()
+					return m, nil
+				}
 			}
 			switch m.Options[m.OptionsCursor] {
 			case "USE SKILL":
@@ -128,6 +137,7 @@ func (m *modelOptions) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						}
 					}
 					m.Aiming = true
+					m.AimCursor = 0
 				}
 			case "SAVE":
 				m.Parent.Logger.AddToLog("We are saving.")
